@@ -1,0 +1,9 @@
+[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://d1ysigqgxlytw"]
+
+[ext_resource type="FontFile" uid="uid://dxuvxv5ebx3gv" path="res://Fonts/SweiFistLegCJKsc-Medium-2.ttf" id="1_2s6bw"]
+
+[resource]
+font = ExtResource("1_2s6bw")
+font_size = 24
+outline_color = Color(0.169245, 0.169245, 0.169245, 1)
+shadow_color = Color(0, 0, 0, 1)

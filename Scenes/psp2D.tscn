@@ -1,0 +1,209 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8hewn2bcwtdu"]
+
+[ext_resource type="LabelSettings" uid="uid://d1ysigqgxlytw" path="res://Settings/LableSettings.tres" id="1_0c4yk"]
+[ext_resource type="FontFile" uid="uid://dxuvxv5ebx3gv" path="res://Fonts/SweiFistLegCJKsc-Medium-2.ttf" id="2_6mkxe"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+layout_direction = 1
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_right = 1280.0
+offset_bottom = 240.0
+grow_horizontal = 2
+color = Color(0.4814, 0.6557, 0.83, 1)
+
+[node name="ColorRect2" type="ColorRect" parent="Control"]
+layout_direction = 1
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 240.0
+offset_right = 1280.0
+offset_bottom = 760.0
+grow_horizontal = 2
+color = Color(0.0824302, 0.161423, 0.23789, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 1275.0
+offset_bottom = 232.0
+
+[node name="应用程序" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/应用程序"]
+layout_mode = 2
+text = "应用程序:"
+label_settings = ExtResource("1_0c4yk")
+vertical_alignment = 1
+
+[node name="LineEdit" type="LineEdit" parent="Control/VBoxContainer/应用程序"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_6mkxe")
+theme_override_font_sizes/font_size = 20
+alignment = 3
+
+[node name="Button" type="Button" parent="Control/VBoxContainer/应用程序"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_6mkxe")
+theme_override_font_sizes/font_size = 20
+text = "浏览"
+
+[node name="启动参数" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/启动参数"]
+layout_mode = 2
+text = "启动参数:"
+label_settings = ExtResource("1_0c4yk")
+vertical_alignment = 1
+
+[node name="LineEdit" type="LineEdit" parent="Control/VBoxContainer/启动参数"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_6mkxe")
+theme_override_font_sizes/font_size = 20
+alignment = 3
+
+[node name="matchmaker" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/matchmaker"]
+layout_mode = 2
+text = "matchmaker.js文件路径:"
+label_settings = ExtResource("1_0c4yk")
+vertical_alignment = 1
+
+[node name="LineEdit" type="LineEdit" parent="Control/VBoxContainer/matchmaker"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_6mkxe")
+theme_override_font_sizes/font_size = 20
+alignment = 3
+
+[node name="Button" type="Button" parent="Control/VBoxContainer/matchmaker"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_6mkxe")
+theme_override_font_sizes/font_size = 20
+text = "浏览"
+
+[node name="cirrus" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/cirrus"]
+layout_mode = 2
+text = "cirrus.js文件路径:"
+label_settings = ExtResource("1_0c4yk")
+vertical_alignment = 1
+
+[node name="LineEdit" type="LineEdit" parent="Control/VBoxContainer/cirrus"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_6mkxe")
+theme_override_font_sizes/font_size = 20
+alignment = 3
+
+[node name="Button" type="Button" parent="Control/VBoxContainer/cirrus"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_6mkxe")
+theme_override_font_sizes/font_size = 20
+text = "浏览"
+
+[node name="ip" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/ip"]
+layout_mode = 2
+text = "IP地址:"
+label_settings = ExtResource("1_0c4yk")
+vertical_alignment = 1
+
+[node name="LineEdit" type="LineEdit" parent="Control/VBoxContainer/ip"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_6mkxe")
+theme_override_font_sizes/font_size = 20
+alignment = 3
+
+[node name="Label2" type="Label" parent="Control/VBoxContainer/ip"]
+layout_mode = 2
+text = "推荐IP:"
+label_settings = ExtResource("1_0c4yk")
+vertical_alignment = 1
+
+[node name="OptionButton" type="OptionButton" parent="Control/VBoxContainer/ip"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="option" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/option"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "MatchMaker尚未启动"
+label_settings = ExtResource("1_0c4yk")
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="Control/VBoxContainer/option"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_6mkxe")
+theme_override_font_sizes/font_size = 20
+text = "启动MatchMaker"
+
+[node name="option2" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/option2"]
+layout_mode = 2
+text = "进程名:"
+label_settings = ExtResource("1_0c4yk")
+vertical_alignment = 1
+
+[node name="LineEdit" type="LineEdit" parent="Control/VBoxContainer/option2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_6mkxe")
+theme_override_font_sizes/font_size = 20
+alignment = 3
+
+[node name="Button" type="Button" parent="Control/VBoxContainer/option2"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_6mkxe")
+theme_override_font_sizes/font_size = 20
+text = "开启新实例"
+
+[node name="Label2" type="Label" parent="Control/VBoxContainer/option2"]
+layout_mode = 2
+text = "常驻实例数量:"
+label_settings = ExtResource("1_0c4yk")
+vertical_alignment = 1
+
+[node name="LineEdit2" type="LineEdit" parent="Control/VBoxContainer/option2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_6mkxe")
+theme_override_font_sizes/font_size = 20
+alignment = 3
