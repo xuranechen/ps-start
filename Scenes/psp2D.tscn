@@ -157,7 +157,6 @@ size_flags_vertical = 4
 theme_override_colors/font_uneditable_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_6mkxe")
 theme_override_font_sizes/font_size = 20
-alignment = 3
 editable = false
 
 [node name="AllIP" type="Label" parent="Control/VBoxContainer/ip"]
