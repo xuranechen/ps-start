@@ -1,0 +1,1 @@
+-PixelStreamingHideCursor -ForceRes -PixelStreamingWebRTCMaxBitrate=60000000 -NvEncH264ConfigLevel=NV_ENC_LEVEL_H264_51
