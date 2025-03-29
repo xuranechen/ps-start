@@ -1,11 +1,12 @@
-extends "res://Scripts/config_base.gd"
+extends "res://Scripts/MainScene/config_base.gd"
 
 
 var file_dialog: FileDialog
 var cirrusr_path: LineEdit # 添加对输入框的引用
+var peerConnectionOptions = "{ \\\"iceServers\\\": [{\\\"urls\\\": [\\\"stun:IPIP:19302\\\",\\\"turn:IPIP:19303\\\"], \\\"username\\\": \\\"PixelStreamingUser\\\", \\\"credential\\\": \\\"Another TURN in the road\\\"}] }";
 
 func _ready():
-	cirrusr_path = get_node("/root/Node2D/Control/VBoxContainer/cirrus/CirrusPath")
+	cirrusr_path = $CirrusPath
 	
 	# 使用 ConfigFile 读取文件路径
 	cirrusr_path.text = _read_config("CirrusPath")
@@ -31,13 +32,25 @@ func _select_file():
 	file_dialog.canceled.connect(_on_cancel)
 	
 	# 弹出对话框
-	file_dialog.popup_centered(Vector2i(800, 600))
+	file_dialog.popup_centered(Vector2i(800, 500))
 
 func _on_file_selected(path: String):
 	cirrusr_path.text = path # 将选择的文件路径赋值给输入框
 	print("选择的文件:", path) # 汉化输出信息
 	# 使用 ConfigFile 保存文件路径
 	_save_config("CirrusPath", path)
+
+func _start_cirrus_instance():
+	print("开始初始化Cirrus运行环境")
 	
+
+func _run_cirrus_instance(path: String):
+	print("开始运行Cirrus:", path)
+	
+
+func _stop_cirrus_instance():
+	print("Cirrus进程已终止")
+
+
 func _on_cancel():
 	print("操作取消")

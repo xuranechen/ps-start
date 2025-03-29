@@ -2,4 +2,5 @@
 .godot/
 /android/
 .vscode/
+.vscode/settings.json
 logs/

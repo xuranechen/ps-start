@@ -1,14 +1,14 @@
-extends "res://Scripts/config_base.gd"
+extends "res://Scripts/MainScene/config_base.gd"
 
 
 var file_dialog: FileDialog
-var matchmaker_path: LineEdit # 添加对输入框的引用
+var app_path: LineEdit # 添加对输入框的引用
 
 func _ready():
-	matchmaker_path = get_node("/root/Node2D/Control/VBoxContainer/matchmaker/MatchmakerPath")
+	app_path = $AppPath
 	
 	# 使用 ConfigFile 读取文件路径
-	matchmaker_path.text = _read_config("MatchmakerPath")
+	app_path.text = _read_config("AppExe")
 
 func _select_file():
 	# 创建文件对话框实例
@@ -20,7 +20,7 @@ func _select_file():
 	file_dialog.title = "选择流送应用" # 设置对话框标题为"选择流送应用"
 	file_dialog.access = FileDialog.ACCESS_FILESYSTEM # 访问完整文件系统
 	file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE # 选择单个文件
-	file_dialog.filters = ["*.js"] # 文件类型过滤
+	file_dialog.filters = ["*.exe"] # 文件类型过滤
 	
 	# 设置按钮文本为中文
 	file_dialog.set_ok_button_text("确定") # 设置确定按钮文本
@@ -31,13 +31,13 @@ func _select_file():
 	file_dialog.canceled.connect(_on_cancel)
 	
 	# 弹出对话框
-	file_dialog.popup_centered(Vector2i(800, 600))
+	file_dialog.popup_centered(Vector2i(800, 500))
 
 func _on_file_selected(path: String):
-	matchmaker_path.text = path # 将选择的文件路径赋值给输入框
+	app_path.text = path # 将选择的文件路径赋值给输入框
 	print("选择的文件:", path) # 汉化输出信息
 	# 使用 ConfigFile 保存文件路径
-	_save_config("MatchmakerPath", path)
+	_save_config("AppExe", path)
 	
 func _on_cancel():
 	print("操作取消")
