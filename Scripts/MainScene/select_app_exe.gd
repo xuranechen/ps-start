@@ -2,11 +2,9 @@ extends "res://Scripts/MainScene/config_base.gd"
 
 
 var file_dialog: FileDialog
-var app_path: LineEdit # 添加对输入框的引用
+@onready var app_path = $AppPath
 
 func _ready():
-	app_path = $AppPath
-	
 	# 使用 ConfigFile 读取文件路径
 	app_path.text = _read_config("AppExe")
 

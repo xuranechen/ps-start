@@ -2,20 +2,17 @@ extends "res://Scripts/MainScene/config_base.gd"
 
 
 var file_dialog: FileDialog
-var matchmaker_path: LineEdit # 添加对输入框的引用
-var matchmaker_lable:Label
-var cirrus_container:HBoxContainer
 var mk_process_thread: Thread
 var mk_process_output: FileAccess
 var mk_process = null
 
+@onready var matchmaker_path = $MatchmakerPath
+@onready var matchmaker_lable = $"../MK操作栏/MatchmakerNumLabel"
+@onready var cirrus_container = $"../cirrus"
+
 signal process_done(message)
 
 func _ready():
-	matchmaker_path = $MatchmakerPath
-	matchmaker_lable = $"../MK操作栏/MatchmakerNumLabel"
-	cirrus_container = $"../cirrus"
-	
 	process_done.connect(_show_mk_state)
 	
 	# 使用 ConfigFile 读取文件路径

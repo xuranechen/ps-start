@@ -74,6 +74,7 @@ layout_mode = 2
 script = ExtResource("1_qdr3t")
 
 [node name="AppLable" type="Label" parent="Control/VBoxContainer/应用程序"]
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 text = "应用程序:"
 label_settings = ExtResource("1_0c4yk")
@@ -100,6 +101,7 @@ layout_mode = 2
 script = ExtResource("4_1vif1")
 
 [node name="ParamsLable" type="Label" parent="Control/VBoxContainer/启动参数"]
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 text = "启动参数:"
 label_settings = ExtResource("1_0c4yk")
@@ -118,6 +120,7 @@ layout_mode = 2
 script = ExtResource("5_cxh11")
 
 [node name="MatchmakerLable" type="Label" parent="Control/VBoxContainer/matchmaker"]
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 text = "matchmaker.js文件路径:"
 label_settings = ExtResource("1_0c4yk")
@@ -145,6 +148,7 @@ layout_mode = 2
 script = ExtResource("6_34042")
 
 [node name="CirrusLabel" type="Label" parent="Control/VBoxContainer/cirrus"]
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 text = "cirrus.js文件路径:"
 label_settings = ExtResource("1_0c4yk")
@@ -172,6 +176,7 @@ layout_mode = 2
 script = ExtResource("7_75em0")
 
 [node name="IPLabel" type="Label" parent="Control/VBoxContainer/ip"]
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 text = "IP地址:"
 label_settings = ExtResource("1_0c4yk")
@@ -193,6 +198,7 @@ label_settings = ExtResource("1_0c4yk")
 vertical_alignment = 1
 
 [node name="IPList" type="OptionButton" parent="Control/VBoxContainer/ip"]
+custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -202,11 +208,13 @@ layout_mode = 2
 [node name="MatchmakerNumLabel" type="Label" parent="Control/VBoxContainer/MK操作栏"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 1
 text = "Matchmaker尚未启动"
 label_settings = ExtResource("1_0c4yk")
 vertical_alignment = 1
 
 [node name="StartMatchmaker" type="Button" parent="Control/VBoxContainer/MK操作栏"]
+custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("2_6mkxe")
@@ -233,25 +241,12 @@ alignment = 3
 editable = false
 
 [node name="StartApp" type="Button" parent="Control/VBoxContainer/进程操作栏"]
+custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("2_6mkxe")
 theme_override_font_sizes/font_size = 20
 text = "开启新实例"
-
-[node name="ProcessNumLable" type="Label" parent="Control/VBoxContainer/进程操作栏"]
-layout_mode = 2
-text = "常驻实例数量:"
-label_settings = ExtResource("1_0c4yk")
-vertical_alignment = 1
-
-[node name="ProcessNum" type="LineEdit" parent="Control/VBoxContainer/进程操作栏"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 4
-theme_override_fonts/font = ExtResource("2_6mkxe")
-theme_override_font_sizes/font_size = 20
-alignment = 3
 
 [connection signal="pressed" from="Control/VBoxContainer/应用程序/AppSelect" to="Control/VBoxContainer/应用程序" method="_select_file"]
 [connection signal="pressed" from="Control/VBoxContainer/matchmaker/MatchmakerSelect" to="Control/VBoxContainer/matchmaker" method="_select_file"]

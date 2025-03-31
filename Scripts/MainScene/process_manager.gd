@@ -1,16 +1,14 @@
 extends "res://Scripts/MainScene/config_base.gd"
 
 
-var matchmaker_container = HBoxContainer
-var cirrus_container = HBoxContainer
 var mk_process_thread: Thread
 var mk_process_output: FileAccess
 var mk_process = null
 
-func _ready() -> void:
-	matchmaker_container = $Control/VBoxContainer/matchmaker
-	cirrus_container = $Control/VBoxContainer/cirrus
+@onready var matchmaker_container = $Control/VBoxContainer/matchmaker
+@onready var cirrus_container = $Control/VBoxContainer/cirrus
 
+# Matchmaker相关函数-------------------------------------------------------------
 # 启动matchmaker进程
 func _start_mk_instance():
 	print("开始初始化MK运行环境")
@@ -40,7 +38,7 @@ func _listen_mk_output():
 func _on_mk_logout(logout: String):
 	# 当用户连接并监测到暂无空闲实例时，自动开启新实例（信令+exe）
 	if logout.contains("WARNING: No empty Cirrus servers are available"):
-		cirrus_container._start_cirrus_instance()
+		_start_cirrus_instance()
 	# 监测到某端口的exe信号丢失，自动重启该端口的exe
 	elif logout.contains("streamer disconnected"):
 		print()
@@ -57,10 +55,9 @@ func _on_mk_logout(logout: String):
 	elif logout.contains("disconnected from Matchmaker"):
 		print()
 
-# 子进程触发信号
+# 修改matchmaker启动状态
 func _emit_process_done(message: String):
 	matchmaker_container._show_mk_state(message)
-	#process_done.emit(message)
 
 # 终止matchmaker进程
 func _stop_mk_instance():
@@ -71,6 +68,21 @@ func _stop_mk_instance():
 	mk_process_thread = null
 	print("MK进程已终止")
 	call_deferred("_emit_process_done", "Matchmaker尚未启动")
+# Matchmaker相关函数-------------------------------------------------------------
+
+# Cirrus相关函数-----------------------------------------------------------------
+
+func _start_cirrus_instance():
+	print("开始初始化Cirrus运行环境")
+	
+
+func _run_cirrus_instance(path: String):
+	print("开始运行Cirrus:", path)
+	
+
+func _stop_cirrus_instance():
+	print("Cirrus进程已终止")
+
 
 func _exit_tree() -> void:
 	_stop_mk_instance()

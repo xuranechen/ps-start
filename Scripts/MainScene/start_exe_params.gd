@@ -1,10 +1,9 @@
 extends "res://Scripts/MainScene/config_base.gd"
 
 
-var params:LineEdit
+@onready var params = $Params
 
 func _ready() -> void:
-	params = $Params
 	params.text = _read_config("Params")
 	params.text_submitted.connect(_input_params)
 

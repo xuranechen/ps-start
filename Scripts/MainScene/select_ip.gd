@@ -1,17 +1,11 @@
 extends "res://Scripts/MainScene/config_base.gd"
 
 
-var ip_list: OptionButton
-var ip_input: LineEdit
-var mk_container:HBoxContainer
-var main_node:Node2D
+@onready var ip_list = $IPList
+@onready var ip_input = $IP
+@onready var main_node = $"../../.."
 
 func _ready() -> void:
-	ip_list = $IPList
-	ip_input = $IP
-	mk_container = $"../matchmaker"
-	main_node = $"../../.."
-	
 	ip_list.item_selected.connect(_set_ip)
 	ip_input.text = _read_config("SelectedIP")
 	_get_simple_network_info()
@@ -30,7 +24,6 @@ func _ready() -> void:
 		ip_input.text = ip_list.get_item_text(0)
 		selected_ip = ip_input.text
 	
-	#mk_container._start_mk_instance()
 	main_node._start_mk_instance()
 
 func _get_simple_network_info():
@@ -63,4 +56,4 @@ func _get_interface_type(interface_name: String) -> String:
 func _set_ip(index: int):
 	ip_input.text = ip_list.get_item_text(index).split(":")[1]
 	_save_config("SelectedIP", ip_input.text)
-	mk_container._start_mk_instance()
+	main_node._start_mk_instance()
