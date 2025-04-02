@@ -1,6 +1,6 @@
 extends Node
 
-func _read_config(config_Name: String):
+func _read_config(config_Name: String) -> String:
 	var config = ConfigFile.new()
 	var err = config.load("res://config.cfg")  # 修改为项目文件夹下的路径
 	if err == OK:
@@ -15,7 +15,7 @@ func _read_config(config_Name: String):
 		print("无法加载配置文件。")
 		return ""
 
-func _save_config(config_Name: String, config_Value: String):
+func _save_config(config_Name: String, config_Value: String) -> void:
 	var config = ConfigFile.new()
 	var err = config.load("res://config.cfg")  # 修改为项目文件夹下的路径
 	if err == OK or err == ERR_FILE_NOT_FOUND:

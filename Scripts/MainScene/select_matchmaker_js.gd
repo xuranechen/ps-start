@@ -12,13 +12,13 @@ var mk_process = null
 
 signal process_done(message)
 
-func _ready():
+func _ready() -> void:
 	process_done.connect(_show_mk_state)
 	
 	# 使用 ConfigFile 读取文件路径
 	matchmaker_path.text = _read_config("MatchmakerPath")
 
-func _select_file():
+func _select_file() -> void:
 	# 创建文件对话框实例
 	file_dialog = FileDialog.new()
 	add_child(file_dialog)
@@ -41,18 +41,18 @@ func _select_file():
 	# 弹出对话框
 	file_dialog.popup_centered(Vector2i(800, 500))
 
-func _on_file_selected(path: String):
+func _on_file_selected(path: String) -> void:
 	matchmaker_path.text = path # 将选择的文件路径赋值给输入框
 	print("选择的文件:", path) # 输出信息
 	# 使用 ConfigFile 保存文件路径
 	_save_config("MatchmakerPath", path)
 	
-func _on_cancel():
+func _on_cancel() -> void:
 	print("操作取消")
 
-func _get_mk_path():
+func _get_mk_path() -> String:
 	return matchmaker_path.text
 
 # 更新matchmaker启动状态
-func _show_mk_state(result):
+func _show_mk_state(result) -> void:
 	matchmaker_lable.text = result

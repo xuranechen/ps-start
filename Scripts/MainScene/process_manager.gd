@@ -9,6 +9,7 @@ var peer_connection_options = "{ \\\"iceServers\\\": [{\\\"urls\\\": [\\\"stun:I
 
 @onready var matchmaker_container = $Control/VBoxContainer/matchmaker
 @onready var cirrus_container = $Control/VBoxContainer/cirrus
+@onready var instance_manager = $"Control/进程列表区/ScrollContainer/GridContainer"
 
 var cirrus_instances: Dictionary = {}
 var app_instances: Dictionary = {}
@@ -25,17 +26,17 @@ var http_ports_queue: Array = []
 var streaming_ports_queue: Array = []
 
 # 初始化HTTP端口队列
-func _init_http_port_queue():
+func _init_http_port_queue() -> void:
 	for i in range(5000, 5500):
 		http_ports_queue.append(i)
 
 # 初始化流媒体端口队列
-func _init_streaming_port_queue():
+func _init_streaming_port_queue() -> void:
 	for i in range(1000, 1500):
 		streaming_ports_queue.append(i)
 
 # http_port入队
-func _enqueue_http_port(port: int):
+func _enqueue_http_port(port: int) -> void:
 	http_ports_queue.append(port)
 
 # http_port出队
@@ -45,7 +46,7 @@ func _dequeue_http_port() -> int:
 	return -1
 
 # streaming_port入队
-func _enqueue_streaming_port(port: int):
+func _enqueue_streaming_port(port: int) -> void:
 	streaming_ports_queue.append(port)
 
 # streaming_port出队
@@ -54,7 +55,7 @@ func _dequeue_streaming_port() -> int:
 		return streaming_ports_queue.pop_front()
 	return -1
 
-func _get_ports():
+func _get_ports() -> Dictionary:
 	var ports: Dictionary = {}
 	ports["http_port"] = _dequeue_http_port()
 	ports["streaming_port"] = _dequeue_streaming_port()
@@ -67,7 +68,7 @@ func _ready() -> void:
 
 # Matchmaker相关函数-------------------------------------------------------------
 # 启动matchmaker进程
-func _start_mk_instance():
+func _start_mk_instance() -> void:
 	print("开始初始化MK运行环境")
 	_stop_mk_instance() # 如果已经有进程在运行，先终止它
 	var path = _read_config("MatchmakerPath")
@@ -78,7 +79,7 @@ func _start_mk_instance():
 	mk_process_thread.start(_listen_mk_output)
 
 # 监听matchmaker输出日志
-func _listen_mk_output():
+func _listen_mk_output() -> void:
 	var has_emitted = false
 	while mk_process_output.is_open() and mk_process_output.get_error() == OK:
 		var line = mk_process_output.get_line()
@@ -89,7 +90,7 @@ func _listen_mk_output():
 			has_emitted = true
 
 # 根据matchmaker输出日志，判断执行任务
-func _on_mk_logout(logout: String):
+func _on_mk_logout(logout: String) -> void:
 	# 当用户连接并监测到暂无空闲实例时，自动开启新实例（信令+exe）
 	if logout.contains("WARNING: No empty Cirrus servers are available"):
 		_start_cirrus_instance()
@@ -110,11 +111,11 @@ func _on_mk_logout(logout: String):
 		print()
 
 # 修改matchmaker启动状态
-func _emit_process_done(message: String):
+func _emit_process_done(message: String) -> void:
 	matchmaker_container._show_mk_state(message)
 
 # 终止matchmaker进程
-func _stop_mk_instance():
+func _stop_mk_instance() -> void:
 	if mk_process == null or mk_process.is_empty():
 		return
 	OS.kill(mk_process["pid"])
@@ -125,11 +126,11 @@ func _stop_mk_instance():
 # Matchmaker相关函数-------------------------------------------------------------
 
 # Cirrus相关函数-----------------------------------------------------------------
-func _start_cirrus_instance():
+func _start_cirrus_instance() -> void:
 	print("开始初始化流送信令")
 	_run_cirrus_instance(_get_ports())
 
-func _run_cirrus_instance(ports: Dictionary):
+func _run_cirrus_instance(ports: Dictionary) -> void:
 	print("开始运行Cirrus:", ports["http_port"])
 	# 获取IP地址
 	var ip = _read_config("SelectedIP")
@@ -159,21 +160,18 @@ func _run_cirrus_instance(ports: Dictionary):
 		"streaming_port": ports["streaming_port"]
 	}
 	app_port2cirrus_port[str(ports["streaming_port"])] = str(ports["http_port"])
-	# 更新UI显示
-	cirrus_container._show_cirrus_state("信令已启动：" + str(cirrus_instances.size()) + "个实例")
 	
 	# 创建实例UI
 	# 注意：这里需要实现类似InstanceManager.CreateInstance的功能
 	# _create_instance_ui(process["pid"], ip, str(ports["http_port"]), str(ports["streaming_port"]), _read_config("AppPath"))
-	
+	instance_manager.create_instance(temp_cirrus_process, ip, str(ports["http_port"]), str(ports["streaming_port"]), _read_config("AppPath"))
 	# 启动应用程序
 	_start_app_instance(ports["http_port"], ports["streaming_port"])
 
-func _stop_cirrus_instance(port: int):
+func _stop_cirrus_instance(port: int) -> void:
 	if cirrus_instances.has(str(port)):
 		OS.kill(cirrus_instances[str(port)]["pid"])
 		cirrus_instances.erase(str(port))
-		cirrus_container._show_cirrus_state("信令已启动：" + str(cirrus_instances.size()) + "个实例")
 		app_instances.erase(str(port))
 		cirrus_instances.erase(app_port2cirrus_port[str(port)])
 		app_port2cirrus_port.erase(str(port))
@@ -181,7 +179,7 @@ func _stop_cirrus_instance(port: int):
 # Cirrus相关函数-----------------------------------------------------------------
 
 # 流送应用相关函数-----------------------------------------------------------------
-func _start_app_instance(cirrus_port: int, app_port: int):
+func _start_app_instance(cirrus_port: int, app_port: int) -> void:
 	print("开始初始化流送应用")
 	# 获取应用程序路径和IP地址
 	var app_path = _read_config("AppPath")
@@ -200,18 +198,17 @@ func _start_app_instance(cirrus_port: int, app_port: int):
 		args.append_array(start_commands.split(" "))
 	# 启动应用程序进程
 	var temp_app_process = OS.execute_with_pipe(app_path, args)
-	# 保存进程信息
-	app_instances[str(app_port)] = {
-		"pid": temp_app_process["pid"],
-		"cirrus_port": cirrus_port
-	}
+	if temp_app_process.has("pid"):
+		# 保存进程信息
+		app_instances[str(app_port)] = {
+			"pid": temp_app_process["pid"],
+			"cirrus_port": cirrus_port
+		}
 	
 	# 更新UI显示
 	# 假设有一个UI容器用于显示应用程序状态
-	if has_node("Control/VBoxContainer/app"):
-		$Control/VBoxContainer/app._show_app_state("应用已启动：" + str(app_instances.size()) + "个实例")
 
-func _stop_app_instance(port: int):
+func _stop_app_instance(port: int) -> void:
 	if app_instances.has(str(port)):
 		# 检查进程是否存在
 		var pid = app_instances[str(port)]["pid"]
@@ -224,7 +221,7 @@ func _stop_app_instance(port: int):
 			$Control/VBoxContainer/app._show_app_state("应用已启动：" + str(app_instances.size()) + "个实例")
 	print("流送应用进程已终止")
 
-func _stop_all_app_instance():
+func _stop_all_app_instance() -> void:
 	print("所有流送应用进程已终止")
 	var app_keys = app_instances.keys()
 	for app in app_keys:
@@ -234,7 +231,7 @@ func _stop_all_app_instance():
 	_kill_all_processes_by_name()
 
 # 通过进程名称查找并关闭所有相关进程
-func _kill_all_processes_by_name():
+func _kill_all_processes_by_name() -> void:
 	var exe_name = _read_config("AppName")
 	if exe_name.is_empty():
 		return

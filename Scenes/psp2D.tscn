@@ -2,9 +2,9 @@
 
 [ext_resource type="LabelSettings" uid="uid://d1ysigqgxlytw" path="res://Settings/LableSettings.tres" id="1_0c4yk"]
 [ext_resource type="Script" uid="uid://bhytd3mesu7g4" path="res://Scripts/MainScene/process_manager.gd" id="1_34pu7"]
-[ext_resource type="PackedScene" uid="uid://bit37borjb3f4" path="res://Scenes/app_instance.tscn" id="1_585mj"]
 [ext_resource type="Script" uid="uid://ykmiijpdb1sb" path="res://Scripts/MainScene/select_app_exe.gd" id="1_qdr3t"]
 [ext_resource type="FontFile" uid="uid://dxuvxv5ebx3gv" path="res://Fonts/SweiFistLegCJKsc-Medium-2.ttf" id="2_6mkxe"]
+[ext_resource type="Script" uid="uid://cs6nj5iscwaao" path="res://Scripts/MainScene/InstanceManager.gd" id="2_w36sm"]
 [ext_resource type="Script" uid="uid://cl0ng01g0yxey" path="res://Scripts/MainScene/start_exe_params.gd" id="4_1vif1"]
 [ext_resource type="Script" uid="uid://b60urwxmxeqxx" path="res://Scripts/MainScene/select_matchmaker_js.gd" id="5_cxh11"]
 [ext_resource type="Script" uid="uid://c0bso5mea2v3g" path="res://Scripts/MainScene/select_cirrus_js.gd" id="6_34042"]
@@ -55,9 +55,7 @@ layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
 columns = 5
-
-[node name="AppInstance" parent="Control/进程列表区/ScrollContainer/GridContainer" instance=ExtResource("1_585mj")]
-layout_mode = 2
+script = ExtResource("2_w36sm")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control"]
 layout_mode = 1
@@ -252,3 +250,4 @@ text = "开启新实例"
 [connection signal="pressed" from="Control/VBoxContainer/matchmaker/MatchmakerSelect" to="Control/VBoxContainer/matchmaker" method="_select_file"]
 [connection signal="pressed" from="Control/VBoxContainer/cirrus/CirrusSelect" to="Control/VBoxContainer/cirrus" method="_select_file"]
 [connection signal="pressed" from="Control/VBoxContainer/MK操作栏/StartMatchmaker" to="." method="_start_mk_instance"]
+[connection signal="pressed" from="Control/VBoxContainer/进程操作栏/StartApp" to="." method="_start_cirrus_instance"]

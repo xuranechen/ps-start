@@ -26,7 +26,7 @@ func _ready() -> void:
 	
 	main_node._start_mk_instance()
 
-func _get_simple_network_info():
+func _get_simple_network_info() -> void:
 	var interfaces = IP.get_local_interfaces()
 	for interface in interfaces:
 		var interface_name = interface["friendly"]
@@ -53,7 +53,7 @@ func _get_interface_type(interface_name: String) -> String:
 	else:
 		return "Unknown"
 		
-func _set_ip(index: int):
+func _set_ip(index: int) -> void:
 	ip_input.text = ip_list.get_item_text(index).split(":")[1]
 	_save_config("SelectedIP", ip_input.text)
 	main_node._start_mk_instance()
