@@ -10,6 +10,7 @@ var is_connect = false
 var is_ready = false
 var connected_users = 0
 var timer = 10
+var ready_time = 0
 
 @onready var manager = $"../../../../.."
 @onready var instance_manager = $".."
@@ -31,8 +32,8 @@ func _init_item(proc: Dictionary, ip: String , port: String, stream_port: String
 	app_name.text = exe_path
 
 func _close_instance() -> void:
-	manager._stop_app_instance(int(streaming_port))
 	manager._stop_cirrus_instance(int(streaming_port))
+	manager._stop_app_instance(int(streaming_port))
 	instance_manager.item_dict[streaming_port] = null
 	instance_manager.items.erase(self)
 	queue_free()
@@ -43,12 +44,13 @@ func _client_ready(state: bool) -> void:
 	if not is_ready:
 		bg.color = Color(0.5, 0.5, 0.5)  # 灰色
 	else:
-		_client_disconnected()
+		bg.color = Color(0, 0, 1)  # 蓝色
+		ready_time = Time.get_unix_time_from_system()
 
 # 有用户连接到实例
 func _client_connected() -> void:
 	connected_users += 1
-	users.text = "已连接：" + str(connected_users)
+	users.text = str(connected_users)
 	is_connect = true
 	bg.color = Color(0, 0.482, 0.145)  # 绿色
 
@@ -56,7 +58,7 @@ func _client_connected() -> void:
 func _client_disconnected() -> void:
 	if connected_users > 0:
 		connected_users -= 1
-		users.text = "已连接：" + str(connected_users)
+		users.text = str(connected_users)
 	
 	if connected_users > 0 or not is_ready:
 		return
@@ -73,7 +75,4 @@ func _delay_destroy() -> void:
 func _process(delta: float) -> void:
 	if not is_ready:
 		return
-	if not is_connect and connected_users == 0:
-		users.text = "0"
-	else:
-		run_times.text = "运行时长：" + str(Time.get_unix_time_from_system() - process["start_time"])
+	run_times.text = str(int(Time.get_unix_time_from_system() - ready_time))

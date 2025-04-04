@@ -64,7 +64,7 @@ horizontal_alignment = 1
 
 [node name="RunTimes" type="Label" parent="ColorRect/VBoxContainer"]
 layout_mode = 2
-text = "RunTimes"
+text = "0"
 label_settings = ExtResource("1_wbsgh")
 horizontal_alignment = 1
 
@@ -80,7 +80,7 @@ horizontal_alignment = 1
 
 [node name="Users" type="Label" parent="ColorRect/VBoxContainer"]
 layout_mode = 2
-text = "Users"
+text = "0"
 label_settings = ExtResource("1_wbsgh")
 horizontal_alignment = 1
 

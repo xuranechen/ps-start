@@ -3,10 +3,12 @@ extends "res://Scripts/MainScene/config_base.gd"
 
 var file_dialog: FileDialog
 @onready var app_path = $AppPath
+@onready var app_name = $"../进程操作栏/ProcessName"
 
 func _ready() -> void:
 	# 使用 ConfigFile 读取文件路径
 	app_path.text = _read_config("AppExe")
+	app_name.text = app_path.text.get_file()
 
 func _select_file() -> void:
 	# 创建文件对话框实例
@@ -36,6 +38,7 @@ func _on_file_selected(path: String) -> void:
 	print("选择的文件:", path) # 汉化输出信息
 	# 使用 ConfigFile 保存文件路径
 	_save_config("AppExe", path)
+	app_name.text = path.get_file()
 	
 func _on_cancel() -> void:
 	print("操作取消")

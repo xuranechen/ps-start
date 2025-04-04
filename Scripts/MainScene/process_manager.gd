@@ -73,6 +73,7 @@ func _start_mk_instance() -> void:
 	_stop_mk_instance() # 如果已经有进程在运行，先终止它
 	var path = _read_config("MatchmakerPath")
 	print("开始运行MK:", path)
+	# 隐藏命令行窗口运行
 	mk_process = OS.execute_with_pipe("node", [path, "--HttpPort", "80", "--MatchmakerPort", "89"])
 	mk_process_output = mk_process["stdio"]
 	mk_process_thread = Thread.new()
@@ -96,19 +97,36 @@ func _on_mk_logout(logout: String) -> void:
 		_start_cirrus_instance()
 	# 监测到某端口的exe信号丢失，自动重启该端口的exe
 	elif logout.contains("streamer disconnected"):
-		print()
+		var port_array = logout.split(" ")
+		var temp_port = str(int(port_array[3].split(":")[1]) - 4000)
+		if instance_manager.item_dict.has(temp_port):
+			instance_manager.item_dict[temp_port]._client_ready(false)
+			app_instances.erase(temp_port)
+			_start_app_instance(int(cirrus_instances[temp_port]["http_port"]), int(temp_port))
 	# 监测到实例开启成功
 	elif logout.contains("streamer connected"):
-		print()
+		var port_array = logout.split(" ")
+		var temp_port = str(int(port_array[3].split(":")[1]) - 4000)
+		if instance_manager.item_dict.has(temp_port):
+			instance_manager.item_dict[temp_port]._client_ready(true)
 	# 监测到有用户连接
 	elif logout.contains("Client connected to Cirrus server"):
-		print()
+		var port_array = logout.split(" ")
+		var temp_port = str(int(port_array[6].split(":")[1]) - 4000)
+		if instance_manager.item_dict.has(temp_port):
+			instance_manager.item_dict[temp_port]._client_connected()
 	# 监测到用户关闭连接
 	elif logout.contains("Client disconnected from Cirrus server"):
-		print()
+		var port_array = logout.split(" ")
+		var temp_port = str(int(port_array[6].split(":")[1]) - 4000)
+		if instance_manager.item_dict.has(temp_port):
+			instance_manager.item_dict[temp_port]._client_disconnected()
 	# 监测到信令服务器从MatchMaker断开（此时认为管理员正常关闭），自动关闭该端口实例
 	elif logout.contains("disconnected from Matchmaker"):
-		print()
+		var port_array = logout.split(" ")
+		var temp_port = str(int(port_array[3].split(":")[1]) - 4000)
+		if instance_manager.item_dict.has(temp_port) and instance_manager.item_dict[temp_port] != null:
+			instance_manager.item_dict[temp_port]._close_instance()
 
 # 修改matchmaker启动状态
 func _emit_process_done(message: String) -> void:
@@ -116,6 +134,7 @@ func _emit_process_done(message: String) -> void:
 
 # 终止matchmaker进程
 func _stop_mk_instance() -> void:
+	_kill_all_processes_by_name("node.exe")
 	if mk_process == null or mk_process.is_empty():
 		return
 	OS.kill(mk_process["pid"])
@@ -137,54 +156,92 @@ func _run_cirrus_instance(ports: Dictionary) -> void:
 	var cirrus_path = _read_config("CirrusPath")
 	# 设置peer连接选项
 	peer_connection_options = peer_connection_options.replace("IPIP", ip)
-	# 准备启动参数
-	var args = [
-		cirrus_path,
-		"--UseMatchmaker", "true",
-		"--MatchmakerAddress", ip,
-		"--PublicIp", ip,
-		"--HttpPort", str(ports["http_port"]),
-		"--StreamerPort", str(ports["streaming_port"]),
-		"--peerConnectionOptions", peer_connection_options
-	]
+	
+	# 构建命令行参数字符串
+	var cmd_args = "node \"" + cirrus_path + "\" " + \
+		"--UseMatchmaker true " + \
+		"--MatchmakerAddress " + ip + " " + \
+		"--PublicIp " + ip + " " + \
+		"--HttpPort " + str(ports["http_port"]) + " " + \
+		"--StreamerPort " + str(ports["streaming_port"]) + " " + \
+		"--peerConnectionOptions \"" + peer_connection_options + "\""
+
 	# 检查是否已存在相同端口的进程，如果有则终止
 	if cirrus_instances.has(str(ports["streaming_port"])):
 		OS.kill(cirrus_instances[str(ports["streaming_port"])]["pid"])
 		cirrus_instances.erase(str(ports["streaming_port"]))
-	# 启动进程
-	var temp_cirrus_process = OS.execute_with_pipe("node", args)
+
+	# 显示命令行窗口运行
+	# 直接使用node或无窗口模式运行信令服务器，无法正确流送应用
+	var temp_cirrus_process = OS.execute_with_pipe("cmd.exe", ["/c", "start", "cmd", "/c", cmd_args])
+	
 	# 保存进程信息
 	cirrus_instances[str(ports["streaming_port"])] = {
 		"pid": temp_cirrus_process["pid"],
 		"http_port": ports["http_port"],
-		"streaming_port": ports["streaming_port"]
+		"streaming_port": ports["streaming_port"],
+		"is_cmd_process": true 
 	}
 	app_port2cirrus_port[str(ports["streaming_port"])] = str(ports["http_port"])
-	
 	# 创建实例UI
-	# 注意：这里需要实现类似InstanceManager.CreateInstance的功能
-	# _create_instance_ui(process["pid"], ip, str(ports["http_port"]), str(ports["streaming_port"]), _read_config("AppPath"))
-	instance_manager.create_instance(temp_cirrus_process, ip, str(ports["http_port"]), str(ports["streaming_port"]), _read_config("AppPath"))
+	instance_manager.create_instance(temp_cirrus_process, ip, str(ports["http_port"]), str(ports["streaming_port"]), _read_config("AppExe"))
 	# 启动应用程序
 	_start_app_instance(ports["http_port"], ports["streaming_port"])
 
 func _stop_cirrus_instance(port: int) -> void:
 	if cirrus_instances.has(str(port)):
-		OS.kill(cirrus_instances[str(port)]["pid"])
+		print("开始终止信令进程:", cirrus_instances[str(port)]["pid"])
+		# 如果是通过cmd启动的，我们需要通过taskkill终止相应的node进程
+		if cirrus_instances[str(port)].get("is_cmd_process", false):
+			# 通过端口号构建唯一标识，用于查找和终止对应的node进程
+			var port_str = str(cirrus_instances[str(port)]["streaming_port"])
+			_kill_node_process_by_port(port_str)
+			
+			# 终止cmd窗口进程
+			var cmd_pid = cirrus_instances[str(port)]["pid"]
+			print("终止CMD窗口进程:", cmd_pid)
+			# 使用taskkill强制终止cmd进程及其子进程
+			OS.execute("taskkill", ["/F", "/T", "/PID", str(cmd_pid)], [])
+			# 额外检查并确保进程已终止
+			var output = []
+			OS.execute("tasklist", ["/FI", "PID eq " + str(cmd_pid)], output)
+			if output.size() > 0 and output[0].contains(str(cmd_pid)):
+				print("警告: CMD进程仍在运行，尝试再次终止")
+				OS.execute("taskkill", ["/F", "/T", "/PID", str(cmd_pid)], [])
+		else:
+			# 直接通过pid终止
+			OS.kill(cirrus_instances[str(port)]["pid"])
+		
 		cirrus_instances.erase(str(port))
 		app_instances.erase(str(port))
 		cirrus_instances.erase(app_port2cirrus_port[str(port)])
 		app_port2cirrus_port.erase(str(port))
 	print("信令进程已终止")
+
+# 通过端口号查找并终止node进程
+func _kill_node_process_by_port(port: String) -> void:
+	# 使用netstat查找使用该端口的进程
+	var output = []
+	OS.execute("cmd.exe", ["/c", "netstat -ano | findstr :" + port], output)
+	
+	if not output.is_empty() and output[0].length() > 0:
+		var lines = output[0].split("\n")
+		for line in lines:
+			if line.contains(":" + port):
+				var parts = line.split(" ", false)
+				if parts.size() > 4:
+					var pid = parts[parts.size() - 1].strip_edges()
+					print("找到端口 " + port + " 对应的进程PID: " + pid)
+					OS.execute("taskkill", ["/F", "/PID", pid], [])
 # Cirrus相关函数-----------------------------------------------------------------
 
 # 流送应用相关函数-----------------------------------------------------------------
 func _start_app_instance(cirrus_port: int, app_port: int) -> void:
 	print("开始初始化流送应用")
 	# 获取应用程序路径和IP地址
-	var app_path = _read_config("AppPath")
+	var app_path = _read_config("AppExe")
 	var ip = _read_config("SelectedIP")
-	var start_commands = _read_config("StartCommands")
+	var start_commands = _read_config("Params")
 	# 准备启动参数
 	var args = [
 		"-AllowPixelStreamingCommands",
@@ -196,17 +253,16 @@ func _start_app_instance(cirrus_port: int, app_port: int) -> void:
 	# 添加额外的启动命令
 	if start_commands != "":
 		args.append_array(start_commands.split(" "))
+	print("流送应用启动参数:", args)
 	# 启动应用程序进程
 	var temp_app_process = OS.execute_with_pipe(app_path, args)
 	if temp_app_process.has("pid"):
+		print("启动流送应用完成，端口：" + str(app_port))
 		# 保存进程信息
 		app_instances[str(app_port)] = {
 			"pid": temp_app_process["pid"],
 			"cirrus_port": cirrus_port
 		}
-	
-	# 更新UI显示
-	# 假设有一个UI容器用于显示应用程序状态
 
 func _stop_app_instance(port: int) -> void:
 	if app_instances.has(str(port)):
@@ -222,43 +278,48 @@ func _stop_app_instance(port: int) -> void:
 	print("流送应用进程已终止")
 
 func _stop_all_app_instance() -> void:
-	print("所有流送应用进程已终止")
+	# 先获取所有应用进程名称
+	var app_name = _read_config("AppName")
+	if not app_name.is_empty():
+		_kill_all_processes_by_name(app_name)
+	
+	# 然后清理进程记录
 	var app_keys = app_instances.keys()
 	for app in app_keys:
-		_stop_app_instance(int(app))
+		print("停止流送应用：", app)
+		if app_instances.has(str(app)):
+			var pid = app_instances[str(app)]["pid"]
+			OS.kill(pid)
 	app_instances.clear()
-	# 关闭所有通过进程名称找到的应用进程
-	_kill_all_processes_by_name()
+	print("所有流送应用进程已终止")
 
 # 通过进程名称查找并关闭所有相关进程
-func _kill_all_processes_by_name() -> void:
-	var exe_name = _read_config("AppName")
-	if exe_name.is_empty():
-		return
+func _kill_all_processes_by_name(process_name: String) -> void:
 	# 在Windows上使用tasklist和taskkill命令查找和终止进程
 	var output = []
-	var exit_code = OS.execute("tasklist", ["/FI", "IMAGENAME eq " + exe_name], output)
+	var exit_code = OS.execute("tasklist", ["/FI", "IMAGENAME eq " + process_name], output)
 	if exit_code != 0:
 		print("获取进程列表失败")
 		return
 	# 检查输出中是否包含进程名
 	var process_found = false
 	for line in output[0].split("\n"):
-		if line.contains(exe_name):
+		if line.contains(process_name):
 			process_found = true
 			break
 	if process_found:
 		# 终止所有同名进程
 		var kill_result = []
-		OS.execute("taskkill", ["/F", "/IM", exe_name], kill_result)
-		print("已终止所有 " + exe_name + " 进程")
+		OS.execute("taskkill", ["/F", "/IM", process_name], kill_result)
+		print("已终止所有 " + process_name + " 进程")
 # 流送应用相关函数-----------------------------------------------------------------
 
 func _exit_tree() -> void:
-	_stop_mk_instance()
-	# 停止所有Cirrus实例
+	# 先停止所有应用实例
+	_stop_all_app_instance()
+	# 再停止所有Cirrus实例
 	var cirrus_keys = cirrus_instances.keys()
 	for key in cirrus_keys:
 		_stop_cirrus_instance(int(key))
-	# 停止所有应用实例
-	_stop_all_app_instance()
+	# 最后停止Matchmaker
+	_stop_mk_instance()
