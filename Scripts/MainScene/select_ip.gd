@@ -24,7 +24,7 @@ func _ready() -> void:
 		ip_input.text = ip_list.get_item_text(0)
 		selected_ip = ip_input.text
 	
-	main_node._start_mk_instance()
+	# main_node._start_mk_instance()
 
 func _get_simple_network_info() -> void:
 	var interfaces = IP.get_local_interfaces()

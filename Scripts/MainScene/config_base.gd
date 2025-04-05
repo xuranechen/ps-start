@@ -6,7 +6,7 @@ func _read_config(config_Name: String) -> String:
 	if err == OK:
 		var saved_path = config.get_value("Settings", config_Name, "")  # 获取保存的文件路径
 		if saved_path != "":
-			print("读取的配置:", saved_path)  # 输出读取的路径
+			#print("读取的配置:", saved_path)  # 输出读取的路径
 			return saved_path  # 返回读取的路径
 		else:
 			print("未找到保存的配置。")

@@ -96,7 +96,7 @@ func _on_mk_logout(logout: String) -> void:
 	if logout.contains("WARNING: No empty Cirrus servers are available"):
 		_start_cirrus_instance()
 	# 监测到某端口的exe信号丢失，自动重启该端口的exe
-	elif logout.contains("streamer disconnected"):
+	elif logout.contains("streamer disconnected") or logout.contains("no longer ready for use"):
 		var port_array = logout.split(" ")
 		var temp_port = str(int(port_array[3].split(":")[1]) - 4000)
 		if instance_manager.item_dict.has(temp_port):
@@ -104,7 +104,7 @@ func _on_mk_logout(logout: String) -> void:
 			app_instances.erase(temp_port)
 			_start_app_instance(int(cirrus_instances[temp_port]["http_port"]), int(temp_port))
 	# 监测到实例开启成功
-	elif logout.contains("streamer connected"):
+	elif logout.contains("streamer connected") or logout.contains("ready for use"):
 		var port_array = logout.split(" ")
 		var temp_port = str(int(port_array[3].split(":")[1]) - 4000)
 		if instance_manager.item_dict.has(temp_port):
@@ -161,10 +161,14 @@ func _run_cirrus_instance(ports: Dictionary) -> void:
 	var cmd_args = "node \"" + cirrus_path + "\" " + \
 		"--UseMatchmaker true " + \
 		"--MatchmakerAddress " + ip + " " + \
+		"--MatchmakerPort " + "89" + " " + \
+		"--SFUPort " + str(ports["http_port"] + 2000) + " " + \
 		"--PublicIp " + ip + " " + \
 		"--HttpPort " + str(ports["http_port"]) + " " + \
 		"--StreamerPort " + str(ports["streaming_port"]) + " " + \
 		"--peerConnectionOptions \"" + peer_connection_options + "\""
+
+	print("信令启动命令行:", cmd_args)
 
 	# 检查是否已存在相同端口的进程，如果有则终止
 	if cirrus_instances.has(str(ports["streaming_port"])):
